@@ -1,1 +1,1 @@
-# csc468cloud
+# CSC 468: Intro to Cloud Computing
