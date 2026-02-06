@@ -1,7 +1,7 @@
 # CSC 468: Intro to Cloud Computing
 
 ## Vision
-(/src/diagram.png "Project Diagram")
+![Project Diagram](/src/diagram.png "Project Diagram")
 
 ## Project Proposal
 **Project Idea is taken from "Project Overview" Lecture**
