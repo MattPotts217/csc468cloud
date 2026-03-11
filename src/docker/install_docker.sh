@@ -25,10 +25,13 @@ while IFS= read -r line; do
   sudo usermod -s /bin/bash $line
 done < <( cat /etc/passwd | grep bash | cut -d':' -f1 )
 
-sudo cp /local/repository/docker_config/daemon.json /etc/docker/daemon.json
+sudo cp /local/repository/src/docker/docker_config/daemon.json /etc/docker/daemon.json
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 
 sudo mv /etc/containerd/config.toml /etc/containerd/config.toml.backup
-cp /local/repository/containerd/config.toml /etc/containerd/
+cp /local/repository/src/docker/containerd/config.toml /etc/containerd/
 systemctl restart containerd
+
+# run the container!
+sudo docker compose -f /local/repository/src/docker/docker_config/docker-compose.yml up --build -d
