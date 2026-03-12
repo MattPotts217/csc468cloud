@@ -36,4 +36,4 @@ systemctl restart containerd
 sleep 20
 
 # run the container!
-sudo docker-compose -f /local/repository/src/docker/docker_config/docker-compose.yml up --build -d
+sudo /usr/local/bin/docker-compose -f /local/repository/src/docker/docker_config/docker-compose.yml up --build -d
