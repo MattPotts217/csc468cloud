@@ -33,5 +33,7 @@ sudo mv /etc/containerd/config.toml /etc/containerd/config.toml.backup
 cp /local/repository/src/docker/containerd/config.toml /etc/containerd/
 systemctl restart containerd
 
+sleep 20
+
 # run the container!
 sudo docker-compose -f /local/repository/src/docker/docker_config/docker-compose.yml up --build -d
