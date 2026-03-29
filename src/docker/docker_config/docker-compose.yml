@@ -6,7 +6,18 @@ services:
       dockerfile: docker/docker_config/Dockerfile
     ports:
       - "3000:3000"
+    volumes:
+    - ../../src/server:/app 
+    networks:
+      - csc468cloud
     depends_on:
       - redis
+
   redis:
     image: redis:alpine
+    networks:
+      - csc468cloud
+
+networks:
+  csc468cloud:
+    driver: bridge

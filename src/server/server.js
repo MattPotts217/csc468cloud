@@ -1,14 +1,29 @@
-const http = require('node:http');
+const redis = require('redis');
+const express = require('express');
 
 const hostname = '0.0.0.0';
 const port = 3000;
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello, World!\n');
+const client = redis.createClient({
+  url: 'redis://redis:6379'
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+client.on('error', err => console.log('Redis Client Error', err));
+(async () => {
+  await client.connect();
+  
+  const server = express();
+  
+  server.get('/', async (req, res) => {
+    try {
+      const visits = await client.incr('visits');
+      res.send(`Number of visits: ${visits} to the project`);
+    } catch (err) {
+      res.status(500).send(`error: ${err}`);
+    }
+  });
+  
+  server.listen(port, hostname, () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
+  });
+})();

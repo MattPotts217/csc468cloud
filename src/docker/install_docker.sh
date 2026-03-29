@@ -37,3 +37,7 @@ sleep 20
 
 # run the container!
 sudo /usr/local/bin/docker-compose -f /local/repository/src/docker/docker_config/docker-compose.yml up --build -d
+
+# sudo /local/repository/src/docker/start_runner.sh
+
+#current issue: /usr/bin/docker == docker
