@@ -1,42 +1,60 @@
-# CSC 468: Intro to Cloud Computing
+# CSC 468: Introduction to Cloud Computing
+## Architecture Overview
+![Project Diagram](./src/diagram.png "System Architecture Diagram")
 
-## Vision
-![Project Diagram](/src/diagram.png "Project Diagram")
+## Project Specification
+**Based on "Project Overview" lecture requirements**
 
-## Project Proposal
-**Project Idea is taken from "Project Overview" Lecture**
+### Visitor Counter Application
+This project implements a distributed web application utilizing a Node.js application server communicating with a Redis in-memory data store to maintain a persistent visitor counter. The system increments and returns the counter value upon each client connection to the web server.
 
-### The Visitor Counter
-I plan on using a Node.js web server that will communicate with a Redis database to interact with an integer "visitor_counter" that will increment and return a value when a user connects to the web server. 
+#### Component 1: Node.js Application Server
+The application server provides an HTTP endpoint that retrieves the current visitor count from Redis, atomically increments the value, persists the updated count, and returns the result to the client via HTTP response.
 
-#### Component 1: Node.js Web Server
-A simple web server that will display the integer X. The web server will communicate with Redis to retrieve the value, increment it, replace it and finally display it to the user.
+#### Component 2: Redis Data Store
+A Redis instance serves as the persistence layer, storing the visitor_counter key-value pair. The application server interfaces with Redis to perform atomic read-modify-write operations on the counter value.
 
-#### Redis
-A database that will be storing the integer value for Node.js to interact with. It will store the value "visitor_counter" for the Node.js web server to interact with.
+## Build Configuration
+### Dockerfile Specification
+The build process utilizes the node:18-alpine base image to minimize container footprint while providing the required Node.js runtime environment. The build follows Docker best practices by:
 
-## Build Process
-### Dockerfile
-I chose node:18-alpine so that I would have a Node container running without having to do a lot of work to get it started as opposed to using something like Ubuntu. After that I copy in the package.json and package-lock.json files so that when I run "npm install" (next line) the packages required are already known. Finally, I copy in the rest of the server folder so it has access to the server.js file, and then run server.js after exposing port 3000.
+1. Copying dependency manifests (package.json, package-lock.json) prior to installing dependencies
+2. Executing npm install to install required packages
+3. Copying application source code into the container workspace
+4. Exposing port 3000 for external HTTP traffic
+5. Setting the container entrypoint to execute server.js
 
-## Networking
-Both containers are under the "csc468cloud" Docker network server. As Node is exposed on port 3000, it is able to be connected to from outside using the CloudLab url. Since both containers are running in the same network, I do not need to worry about exposing the Redis port to the outside world, and connection can be handled by server.js.
+This layered approach optimizes Docker's build cache, ensuring dependency installation only occurs when package manifests change.
+
+## Network Architecture
+Both containers operate within the csc468cloud Docker bridge network. The Node.js application server exposes port 3000, making it accessible via the CloudLab instance URL. The Redis container remains unexposed to external networks, accepting connections only from the application server over the internal Docker network. This configuration follows the principle of least privilege by restricting database access to authorized application components while maintaining public HTTP endpoint availability.
 
 ## File Structure
-### root
-Contains profile.py, provides the information for starting the node in CloudLab. Provided by Dr. Ngo.
-### docker
-Contains install_docker and other files related to Docker. install_docker is provided by Dr. Ngo, with changes made by me to start the container on installation and made some changes to file paths.
-#### containerd
-Contains the file config.toml provided by Dr. Ngo. Contains runtime information.
-##### docker_config
-Contains all files related to docker:
- - daemon.json:
-    Contains information for the Docker daemon. File provided by Dr. Ngo.
- - docker-compose.yml:
-    Contains information for docker-compose. Maps port 3000 for connection outside of the container.
- - Dockerfile:
-    Contains information for creating new images in Docker. When a container is created, it runs src/server/server.js to start the server.
 
-### server
-Contains files for the server. 
+```
+CSC468CLOUD/
+├── .github/
+├── src/
+│   ├── docker/
+│   │   ├── containerd/
+│   │   ├── docker_config/
+│   │   │   ├── daemon.json
+│   │   │   ├── docker-compose.yml
+│   │   │   └── Dockerfile
+│   │   └── install_docker.sh
+│   └── server/
+│       ├── frontend/
+│       │   └── src/
+│       │       ├── app.js
+│       │       ├── index.html
+│       │       └── style.css
+│       ├── node_modules/
+│       ├── package-lock.json
+│       ├── package.json
+│       └── server.js
+├── diagram.png
+├── Full_Resume-3.pdf
+├── .gitignore
+├── profile.py
+└── README.md
+```
